@@ -1,0 +1,19 @@
+{
+  "name": "nature-of-code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GrrriiiM/nature-of-code.git"
+  },
+  "author": "",
+  "homepage": "https://github.com/GrrriiiM/nature-of-code#readme",
+  "dependencies": {
+    "p5": "^1.0.0",
+    "serve": "^11.3.0"
+  }
+}
