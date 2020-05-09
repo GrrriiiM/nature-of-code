@@ -46,11 +46,11 @@ class Bola {
     colorirAleatoriamente() {
         
         let cor = {
-            r: this._.p5.noise((this._.p5.frameCount + (this._.n * 10000)) * 0.1) * 255,
-            g: this._.p5.noise((this._.p5.frameCount + (this._.n * 10000) + 1000) * 0.1) * 255,
-            b: this._.p5.noise((this._.p5.frameCount + (this._.n * 10000) + 2000) * 0.1) * 255,
+            r: this._.p5.noise((this._.p5.frameCount + (this._.n * 10000)) * 0.01) * 255,
+            g: this._.p5.noise((this._.p5.frameCount + (this._.n * 10000) + 1000) * 0.01) * 255,
+            b: this._.p5.noise((this._.p5.frameCount + (this._.n * 10000) + 2000) * 0.01) * 255,
         }
-        this._.cor = this._.p5.color(cor.r, cor.g, cor.b, 255 * 0.1);
+        this._.cor = this._.p5.color(cor.r, cor.g, cor.b, 255 * 0.5);
     }
 }
 
