@@ -17,6 +17,9 @@ class Grafico {
     }
 
     desenhar() {
+        this._.p5.fill(0);
+        this._.p5.stroke(0);
+        this._.p5.rect(this._.x, this._.y, this._.w, this._.h)
         let max = this._.ps.reduce((p, c) => p > c ? p : c, 0);
         let min = this._.ps.reduce((p, c) => p < c ? p : c, this._h);
         this._.p5.stroke(255);
@@ -57,49 +60,68 @@ class GraficoNoise extends Grafico {
     }
 }
 
-class GraficoNoise2d extends Grafico {
+
+class Grafico2d extends Grafico {
     constructor(p5, option) {
         super(p5, option);
         this._.ruido = option.ruido;
         this._.contador = 0;
     }
 
-    // novo() {
-    //     var psX = [];
-    //     let d = pixelDensity();
-    //     for(let i = 0; i<this._.h*d; i++)
-    //     {
-    //         psX.push(this._.p5.noise(this._.contador * this._.ruido, i * ruido) * this._.h);
-    //     }
-    //     this._.contador += 1;
-    //     this._.ps.push(psx);
-    // }
-
     desenhar() {
-        this._.p5.loadPixels();
-        let d = this._.p5.pixelDensity();
-        let w = (this._.w * d);
-        let h = (this._.h * d);
-        let y = (this._.y * d);
-        let size = w * h;
-        let start = w * y;
-        for (let i = 0; i<size; i++) {
-            let a = (start + i) * 4;
-            
-            let x = Math.floor(i / w);
-            let y = i - (x * w);
-            if (x == 1) {
-                var xxx = "";
+        if (!this._.carregado) {
+            this._.p5.loadPixels();
+            let d = this._.p5.pixelDensity();
+            let w = (this._.w * d);
+            let h = (this._.h * d);
+            let x = (this._.x * d);
+            let y = (this._.y * d);
+            let totalW = (this._.p5.width * d);
+            let start = (totalW * y) + x;
+            for (let i=0;i<h;i++) {
+                for(let j=0;j<w;j++) {
+                    let x = (i * d);
+                    let p = ((i * totalW) + j + start) * 4;
+                    let n = this.gerar(i, j);
+                    this._.p5.pixels[p] = this._.p5.red(parseInt(255 * n));
+                    this._.p5.pixels[p + 1] = this._.p5.green(parseInt(255 * n));
+                    this._.p5.pixels[p + 2] = this._.p5.blue(parseInt(255 * n));
+                    this._.p5.pixels[p + 3] = this._.p5.alpha(1);
+                }
             }
-            let n = this._.p5.noise(x * this._.ruido, y * this._.ruido)
-            this._.p5.pixels[a] = this._.p5.red(parseInt(255 * n));
-            this._.p5.pixels[a + 1] = this._.p5.green(parseInt(255 * n));
-            this._.p5.pixels[a + 2] = this._.p5.blue(parseInt(255 * n));
-            this._.p5.pixels[a + 3] = this._.p5.alpha(1);
+            this._.p5.updatePixels();
+            this._.carregado = true;
         }
-        this._.p5.updatePixels();
+    }
+
+    gerar(x , y) {
+        return 0;
     }
 
 }
 
-export { GraficoRandom, GraficoNoise, GraficoNoise2d };
+class GraficoNoise2d extends Grafico2d {
+    constructor(p5, option) {
+        super(p5, option);
+    }
+
+    gerar(x, y) {
+        return this._.p5.noise(x * this._.ruido, y * this._.ruido)
+    }
+
+}
+
+
+
+class GraficoRandom2d extends Grafico2d {
+    constructor(p5, option) {
+        super(p5, option);
+    }
+
+    gerar() {
+        return this._.p5.random();
+    }
+
+}
+
+export { GraficoRandom, GraficoNoise, GraficoRandom2d, GraficoNoise2d };
