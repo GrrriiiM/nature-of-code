@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "serve src"
+    "start": "serve src",
+    "deploy": "gh-pages -d src"
   },
   "repository": {
     "type": "git",
