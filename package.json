@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "serve"
+    "start": "serve src"
   },
   "repository": {
     "type": "git",
@@ -13,6 +13,7 @@
   "author": "",
   "homepage": "https://github.com/GrrriiiM/nature-of-code#readme",
   "dependencies": {
+    "gh-pages": "^2.2.0",
     "p5": "^1.0.0",
     "serve": "^11.3.0"
   }

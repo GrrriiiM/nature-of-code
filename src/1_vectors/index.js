@@ -7,7 +7,7 @@ new p5((p5) => {
 
     p5.setup = () => {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
-        for(let i=0;i<200;i++) {
+        for(let i=0;i<100;i++) {
             bolas.push(new Bola(p5, {
                 n: i
             }));
@@ -15,7 +15,7 @@ new p5((p5) => {
     }
     
     p5.draw = () => {
-        //p5.background(0);
+        p5.background(0, 0, 0, 255 * 0.1);
         bolas.forEach(_ => {
             _.mover();
             _.desenhar();
