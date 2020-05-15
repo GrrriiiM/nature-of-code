@@ -14,15 +14,13 @@ export class Area {
         this._ = _;
     }
 
+    get x() { return this._.posicao.x; }
+    get y() { return this._.posicao.y; }
+    get cX() { return this.esquerda + (this._.w/2); }
+    get cY() { return this.superior + (this._.h/2); }
     get esquerda() { return this._.posicao.x; }
     get direita() { return this._.posicao.x + this._.w; }
     get superior() { return this._.posicao.y; }
     get inferior() { return this._.posicao.y + this._.h; }
 
-    checarColisao(forma) {
-        return this.esquerda < forma.direita
-            && this.direita > forma.esquerda
-            && this.superior < forma.inferior
-            && this.inferior > forma.superior;
-    }
 }

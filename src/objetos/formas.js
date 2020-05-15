@@ -4,7 +4,8 @@ export class Forma extends Area {
     constructor(processador, opcoes) {
         super(processador, opcoes)
         opcoes = opcoes || {};
-        this._.m = opcoes.massa || (this._.w * this._.h) / 100;
+        this._.solido = opcoes.solido != undefined ? opcoes.solido : true;
+        this._.m = opcoes.massa || (this._.w * this._.h) * 10;
         this._.cor = this._.p.color(255);
         this._.aceleracao = this._.p.createVector(0, 0);
         this._.velocidade = this._.p.createVector(0, 0);
@@ -12,17 +13,32 @@ export class Forma extends Area {
     }
 
     get processador() { return this._.p; }
-    get x() { return this._.posicao.x; }
-    get y() { return this._.posicao.y; }
+    
     get massa() { return this._.m; }
+    get solido() { return this._.solido; }
+    get vX() { return this._.velocidade.x; }
+    set vX(v) { return this._.velocidade.x = v; }
+    get vY() { return this._.velocidade.y; }
+    set vY(v) { return this._.velocidade.y = v; }
 
     desenhar() {
         this._.aceleracao.limit(this._.aMax);
         this._.velocidade.add(this._.aceleracao);
         this._.posicao.add(this._.velocidade);
-        this.rebaterSaida();
         this._desenhar();
         this._.aceleracao.mult(0);
+    }
+
+    aplicarColisoes(formas) {
+        for(let forma of formas) {
+
+        }
+    }
+
+    checarColisoes(formas) {
+        for(let forma of formas) {
+
+        }
     }
 
     // _desenhar() {
@@ -34,6 +50,7 @@ export class Forma extends Area {
 
 
     rebaterSaida() {
+        if (!this._.solido) return;
         if (this.direita > this._.aW) {
             this._.velocidade.x = this._.velocidade.x * -1
             this._.posicao.x = this._.aW - this._.w;
