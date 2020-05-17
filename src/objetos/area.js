@@ -16,11 +16,19 @@ export class Area {
 
     get x() { return this._.posicao.x; }
     get y() { return this._.posicao.y; }
+    get p() { return this._.posicao; }
+    get w() { return this._.w; }
+    get h() { return this._.h; }
     get cX() { return this.esquerda + (this._.w/2); }
     get cY() { return this.superior + (this._.h/2); }
     get esquerda() { return this._.posicao.x; }
+    set esquerda(v) { return this._.posicao.x = v; }
     get direita() { return this._.posicao.x + this._.w; }
+    set direita(v) { return this._.posicao.x = v - this._.w; }
     get superior() { return this._.posicao.y; }
+    set superior(v) { return this._.posicao.y = v; }
     get inferior() { return this._.posicao.y + this._.h; }
+    set inferior(v) { return this._.posicao.y = v - this._.h; }
+
 
 }
