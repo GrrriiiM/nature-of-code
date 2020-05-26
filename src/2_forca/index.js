@@ -12,13 +12,31 @@ new p5((p5) => {
 
     p5.setup = () => {
         p5.createCanvas(p5.windowWidth, p5.windowHeight);
-        for(let i=0;i<10;i++) bs.push(new Elipse(p5));
+        for(let i=0;i<10;i++) bs.push(new Elipse(p5, { h: 50, w: 50 }));
         
+        let formas = [
+            new Elipse(p5, { x: 50, y: 300, w: 200, h: 200, vX: 0, vMax: 10}),
+            new Retangulo(p5, { x: 900, y: 300, w: 100, h: 100, vX: -10, vMax: 30})
+            // new Elipse(p5, { x: 600, y: 300, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 644, y: 275, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 644, y: 325, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 688, y: 250, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 688, y: 300, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 688, y: 350, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 732, y: 225, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 732, y: 275, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 732, y: 325, w: 50, h: 50, vX: 0, vMax: 50}),
+            // new Elipse(p5, { x: 732, y: 375, w: 50, h: 50, vX: 0, vMax: 50}),
+        ];
+        
+
         mundo = new Mundo(p5, { 
             formas: [ 
-                gravidades.criarTerra(p5), 
-                new Elipse(p5, { h: 400, w: 400 }),
-                ...bs ]});
+                ...formas
+                //gravidades.criarTerra(p5), 
+                //new Retangulo(p5, { h: 200, w: 200, x:p5.height-200 }),
+                //...bs 
+            ]});
     }
     
     p5.draw = () => {
