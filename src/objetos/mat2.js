@@ -1,13 +1,17 @@
 export class Mat2 {
     constructor() {
+        this.m00 = 0;
+        this.m01 = 0;
+        this.m10 = 0;
+        this.m11 = 0;
         this.set(...arguments);
     }
 
     set() {
-        if (arguments.length == 4) {
-            this._set4(arguments[0], arguments[1], arguments[2], arguments[3]);
-        } else {
+        if (arguments.length == 1) {
             this._set1(arguments[0]);
+        } else if (arguments.length == 4) {
+            this._set4(arguments[0], arguments[1], arguments[2], arguments[3]);
         }
     }
 
@@ -78,7 +82,7 @@ export class Vetor2 {
             this.x = arguments[0] || 0;
             this.y = arguments[1] || 0;
         }
-        
+        return this;
     }
 
     get copia() {
@@ -89,8 +93,8 @@ export class Vetor2 {
         return v.copia.neg();
     }
     neg() {
-        this.x = -thix.x;
-        this.y = -thix.y;
+        this.x = -this.x;
+        this.y = -this.y;
         return this;
     }
 
@@ -100,8 +104,8 @@ export class Vetor2 {
             this.x = this.x + a.x;
             this.y = this.y + a.y;
         } else {
-            this.x = thix.x + a;
-            this.y = thix.y + a;
+            this.x = this.x + a;
+            this.y = this.y + a;
         }
         return this;
     }
@@ -112,8 +116,8 @@ export class Vetor2 {
             this.x = this.x - a.x;
             this.y = this.y - a.y;
         } else {
-            this.x = thix.x - a;
-            this.y = thix.y - a;
+            this.x = this.x - a;
+            this.y = this.y - a;
         }
         return this;
     }
@@ -124,8 +128,10 @@ export class Vetor2 {
             this.x = this.x * a.x;
             this.y = this.y * a.y;
         } else if (a instanceof Mat2) {
-            this.x = a.m00 * this.x + a.m01 * this.y;
-		    this.y = a.m10 * this.x + a.m11 * this.y;
+            let x = a.m00 * this.x + a.m01 * this.y;
+            let y = a.m10 * this.x + a.m11 * this.y;
+            this.x = x;
+		    this.y = y;
         } else {
             this.x = this.x * a;
             this.y = this.y * a;
@@ -139,8 +145,8 @@ export class Vetor2 {
             this.x = this.x / a.x;
             this.x = this.y / a.y;
         } else {
-            this.x = thix.x / a;
-            this.y = thix.y / a;
+            this.x = this.x / a;
+            this.y = this.y / a;
         }
         return this;
     }
@@ -174,8 +180,8 @@ export class Vetor2 {
         return this;
     }
 
-    static scalar(v1, v2) { return v1.copia.scalar(v2) };
-    scalar(v) {
+    static escalar(v1, v2) { return v1.copia.escalar(v2) };
+    escalar(v) {
         return this.x*v.x + this.y*v.y;
     }
 

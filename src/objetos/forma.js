@@ -7,7 +7,7 @@ export class Corpo {
         this.velocidade = new Vetor2();
         this.velocidadeAngular = 0;
         this.torque = 0;
-        this._orientacao = Math.random(Math.PI * 2) - Math.PI;
+        
         this.forca = new Vetor2;
         this.friccaoEstatica = 0.5;
         this.friccaoDinamica = 0.3;
@@ -17,7 +17,8 @@ export class Corpo {
         this.inercia = 0;
         this.inerciaInv = 0;
 
-        this.forma.corpo = this;
+		this.forma.corpo = this;
+		this.orientacao = 0;
         this.forma.iniciar();
     }
 
@@ -26,8 +27,8 @@ export class Corpo {
     }
 
     aplicarImpulso(impulso, contato) {
-        this.velocidade.adic(Vetor2.mult(impulse, invMass));
-        this.velocidadeAngular += this.inerciaInv * Vetor2.vetorial(contato, impulso);
+        this.velocidade.adic(Vetor2.mult(impulso, this.massaInv));
+        this.velocidadeAngular += this.inerciaInv * Vetor2.vetorial2(contato, impulso);
     }
 
     estatico() {
@@ -111,79 +112,78 @@ export class Poligono extends Forma {
 	}
 
     set(vertices) {
-        // let rightMost = 0;
-        // let highestXCoord = vertices[0].x;
+        let rightMost = 0;
+        let highestXCoord = vertices[0].x;
 
-        // for (let i=1; i < vertices.length; ++i) {
-        //     let x = vertices[i].x;
+        for (let i=1; i < vertices.length; ++i) {
+            let x = vertices[i].x;
 
-        //     if (x > highestXCoord) {
-        //         highestXCoord = x;
-        //         rightMost = i;
-        //     } else if (x == highestXCoord) {
-        //         if (vertices[i].y < vertices[rightMost].y) {
-        //             rightMost = i;
-        //         }
-        //     }
-        // }
+            if (x > highestXCoord) {
+                highestXCoord = x;
+                rightMost = i;
+            } else if (x == highestXCoord) {
+                if (vertices[i].y < vertices[rightMost].y) {
+                    rightMost = i;
+                }
+            }
+        }
 
-        // let hull = [];
-        // let outCount = 0;
-        // let indexHull = rightMost;
+        let hull = [];
+        let outCount = 0;
+        let indexHull = rightMost;
 
-        // for(;;) {
-        //     hull[outCount] = indexHull;
+        for(;;) {
+            hull[outCount] = indexHull;
 
-        //     let nextHullIndex = 0;
-        //     for (let i=0; i<vertices.length; ++i) {
-        //         if (nextHullIndex == indexHull) {
-        //             nextHullIndex = i;
-        //             continue;
-        //         }
+            let nextHullIndex = 0;
+            for (let i=0; i<vertices.length; ++i) {
+                if (nextHullIndex == indexHull) {
+                    nextHullIndex = i;
+                    continue;
+                }
 
-        //         let e1 = vertices[nextHullIndex].copia.sub(vertices[hull[outCount]]);
-        //         let e2 = vertices[i].copia.sub(vertices[hull[outCount]]);
-        //         let c = Vetor2.vetorial2(e1,e2 );
-        //         if (c < 0) {
-        //             nextHullIndex = i;
-        //         }
+                let e1 = vertices[nextHullIndex].copia.sub(vertices[hull[outCount]]);
+                let e2 = vertices[i].copia.sub(vertices[hull[outCount]]);
+                let c = Vetor2.vetorial2(e1,e2 );
+                if (c < 0) {
+                    nextHullIndex = i;
+                }
 
-        //         if (c == 0 && e2.magQ > e1.magQ) {
-        //             nextHullIndex = i;
-        //         }
-        //     }
+                if (c == 0 && e2.magQ > e1.magQ) {
+                    nextHullIndex = i;
+                }
+            }
 
-        //     ++outCount;
-        //     indexHull = nextHullIndex;
+            ++outCount;
+            indexHull = nextHullIndex;
 
-        //     if (nextHullIndex == rightMost) {
-        //         this.vertexCount = outCount;
-        //         break;
-        //     }
-        // }
+            if (nextHullIndex == rightMost) {
+                this.vertexCount = outCount;
+                break;
+            }
+        }
 
-        // for (let i = 0; i < this.vertexCount; ++i) {
-        //     this.vertices.push(vertices[hull[i]].copia);
-        // }
+        for (let i = 0; i < this.vertexCount; ++i) {
+            this.vertices.push(vertices[hull[i]].copia);
+        }
 
-		this.vertices = vertices;
-		this.vertexCount = this.vertices.length;
+		//this.vertices = vertices;
+		//this.vertexCount = this.vertices.length;
         for (let i=0; i<this.vertexCount; ++i) {
-            let face = this.vertices[(i + 1) % this.vertexCount].copia.sub(vertices[i]);
+            let face = this.vertices[(i + 1) % this.vertexCount].copia.sub(this.vertices[i]);
 
             this.normals.push(new Vetor2(face.y, -face.x).norm());
         }
     }
 
-    Suporte(dir)
-	{
-		let bestProjection = Number.MAX_VALUE;
+    suporte(dir) {
+		let bestProjection = -Number.MAX_VALUE;
 		let bestVertex = null;
 
 		for (let i=0; i<this.vertexCount; ++i)
 		{
 			let v = this.vertices[i];
-			let projection = Vetor2.Escalar(v, dir);
+			let projection = Vetor2.escalar(v, dir);
 
 			if (projection > bestProjection)
 			{
@@ -201,9 +201,9 @@ export class Manifold {
 	constructor(corpo1, corpo2)
 	{
 		this.A = corpo1;
-	    this.B = copor2;
+	    this.B = corpo2;
 	    this.penetration = 0;
-	    this.normal = new Vec2();
+	    this.normal = new Vetor2();
 	    this.contacts = [ new Vetor2(), new Vetor2() ];
 	    this.contactCount = 0;
 	    this.e = 0;
@@ -213,85 +213,87 @@ export class Manifold {
 	}
 
 	solve() {
-		this.collision.handleCollision( this, A, B );
+		this.collision.handleCollision( this, this.A, this.B );
 	}
 
 	initialize() {
 
-		this.e = Math.min(this.A.restitution, this.B.restitution);
+		this.e = Math.min(this.A.restituicao, this.B.restituicao);
 
         this.sf = Math.sqrt(this.A.friccaoEstatica*this.A.friccaoEstatica + this.B.friccaoEstatica*this.B.friccaoEstatica);
         this.df = Math.sqrt(this.A.friccaoDinamica * this.A.friccaoDinamica + this.B.friccaoDinamica * this.B.friccaoDinamica);
 
 		for (let i=0; i < this.contactCount; ++i) {
-			let ra = this.contacts[i].sub(A.posicao);
-			let rb = this.contacts[i].sub(B.posicao);
+			let ra = this.contacts[i].copia.sub(this.A.posicao);
+			let rb = this.contacts[i].copia.sub(this.B.posicao);
 
-            let rv = this.B.velocidade.copia.adic(Vetor2.vetorial(this.B.velocidadeAngular, rb))
-                .sub(A.velocidade)
-                .sub(Vetor2.vetorial(this.A.velocidadeAngular, ra));
+			let vv = Vetor2.vetorial(rb, -this.B.velocidadeAngular);
+			let rv = this.B.velocidade.copia
+			rv.adic(vv);
+            rv.sub(this.A.velocidade)
+            rv.sub(Vetor2.vetorial(ra, -this.A.velocidadeAngular));
 
-            // if (rv.lengthSq() < ImpulseMath.RESTING)
-            // {
-            // 	this.e = 0;
-            // }
+            if (rv.magQ < Global.RESTING)
+            {
+            	this.e = 0;
+            }
 		}
 	}
 
 	applyImpulse() {
 
-		if (A.invMass + B.invMass == 0) {
+		if (this.A.massaInv + this.B.massaInv == 0) {
 			this.infiniteMassCorrection();
 			return;
 		}
 
-		for (let i=0; i < contactCount; ++i) {
-			let ra = contacts[i].copia.sub(this.A.position);
-			let rb = contacts[i].copia.sub(this.B.position);
+		for (let i=0; i < this.contactCount; ++i) {
+			let ra = this.contacts[i].copia.sub(this.A.posicao);
+			let rb = this.contacts[i].copia.sub(this.B.posicao);
 
             let rv = this.B.velocidade.copia
-                .add(Vetor2.vetorial(this.B.velocidadeAngular, rb))
+                .adic(Vetor2.vetorial(rb, -this.B.velocidadeAngular))
                 .sub(this.A.velocidade)
-                .sub(Vetor2.vetorial(this.A.velocidadeAngular, ra));
+                .sub(Vetor2.vetorial(ra, -this.A.velocidadeAngular));
 
-			let contactVel = Vetor2.scalar(rv, normal);
+			let contactVel = Vetor2.escalar(rv, this.normal);
 
 			if (contactVel > 0)
 			{
 				return;
 			}
-			let raCrossN = Vetor2.vetorial(ra, normal);
-			let rbCrossN = Vetor2.vetorial(rb, normal);
+			let raCrossN = Vetor2.vetorial2(ra, this.normal);
+			let rbCrossN = Vetor2.vetorial2(rb, this.normal);
 			let invMassSum = this.A.massaInv + this.B.massaInv + (raCrossN * raCrossN) * this.A.inerciaInv + (rbCrossN * rbCrossN) * this.B.inerciaInv;
 
 			// Calculate impulse scalar
 			let j = -(1 + this.e) * contactVel;
 			j /= invMassSum;
-			j /= contactCount;
+			j /= this.contactCount;
 
 			// Apply impulse
-			let impulse = this.normal.mult(j);
-			this.A.applyImpulse(impulse.neg(), ra );
-			this.B.applyImpulse(impulse, rb );
+			let impulse = this.normal.copia.mult(j);
+			this.A.aplicarImpulso(impulse.copia.neg(), ra );
+			this.B.aplicarImpulso(impulse, rb );
 
 			// Friction impulse
 			// rv = B->velocity + Cross( B->angularVelocity, rb ) -
 			// A->velocity - Cross( A->angularVelocity, ra );
             rv = this.B.velocidade.copia
-                .adic(Vetor2.vetorial(this.B.velocidadeAngular, rb))
+                .adic(Vetor2.vetorial(rb, -this.B.velocidadeAngular))
                 .sub(this.A.velocidade)
-                .sub(Vetor2.vetorial(this.A.velocidadeAngular, ra));
+                .sub(Vetor2.vetorial(ra, -this.A.velocidadeAngular));
 
 			// Vec2 t = rv - (normal * Dot( rv, normal ));
 			// t.Normalize( );
             let t = rv.copia
-                .adic(Vetor2.mult(normal, -Vetor2.scalar(rv, normal)))
+                .adic(Vetor2.mult(this.normal, -Vetor2.escalar(rv, this.normal)))
 			    .norm();
 
 			// j tangent magnitude
-			let jt = -Vetor2.scalar(rv, t);
+			let jt = -Vetor2.escalar(rv, t);
 			jt /= invMassSum;
-			jt /= contactCount;
+			jt /= this.contactCount;
 
 			// Don't apply tiny friction impulses
 			if (jt == 0) {
@@ -300,14 +302,14 @@ export class Manifold {
 
             let tangentImpulse;
             
-			if (Math.abs(jt) < j * sf) {
-				tangentImpulse = t.copia.mul(jt);
+			if (Math.abs(jt) < j * this.sf) {
+				tangentImpulse = t.copia.mult(jt);
 			} else {
-				tangentImpulse = t.copia.mult(j).mult(-df);
+				tangentImpulse = t.copia.mult(j).mult(-this.df);
 			}
 
-			A.aplicarImpulso(tangentImpulse.copia.neg(), ra);
-			B.aplicarImpulso(tangentImpulse, rb);
+			this.A.aplicarImpulso(tangentImpulse.copia.neg(), ra);
+			this.B.aplicarImpulso(tangentImpulse, rb);
 		}
 	}
 
@@ -316,8 +318,8 @@ export class Manifold {
         const PENETRATION_CORRETION = 0.4
 		let correction = Math.max(this.penetration - PENETRATION_ALLOWANCE, 0) / (this.A.massaInv + this.B.massaInv) * PENETRATION_CORRETION;
 
-		this.A.posicao.add(normal.copia.mult(-this.A.massaInv * correction));
-		this.B.posicao.add(normal.copia.mult(this.B.massaInv * correction));
+		this.A.posicao.adic(this.normal.copia.mult(-this.A.massaInv * correction));
+		this.B.posicao.adic(this.normal.copia.mult(this.B.massaInv * correction));
 	}
 
 	infiniteMassCorrection()
@@ -333,20 +335,20 @@ class CollisionPolygonPolygon {
 	
 	handleCollision(m, a, b)
 	{
-		let A = a.shape;
-		let B = b.shape;
+		let A = a.forma;
+		let B = b.forma;
 		m.contactCount = 0;
 
 		// Check for a separating axis with A's face planes
 		let faceA = [0];
-		let penetrationA = findAxisLeastPenetration(faceA, A, B );
+		let penetrationA = this.findAxisLeastPenetration(faceA, A, B );
 		if (penetrationA >= 0) {
 			return;
 		}
 
 		// Check for a separating axis with B's face planes
 		let faceB = [0];
-		let penetrationB = findAxisLeastPenetration(faceB, B, A );
+		let penetrationB = this.findAxisLeastPenetration(faceB, B, A );
 		if (penetrationB >= 0) {
 			return;
 		}
@@ -376,30 +378,33 @@ class CollisionPolygonPolygon {
 		// World space incident face
 		let incidentFace = [];
 
-		findIncidentFace(incidentFace, RefPoly, IncPoly, referenceIndex);
+		this.findIncidentFace(incidentFace, RefPoly, IncPoly, referenceIndex);
 
-		let v1 = RefPoly.vertices[referenceIndex];
+		let v1 = RefPoly.vertices[referenceIndex].copia;
 		referenceIndex = referenceIndex + 1 == RefPoly.vertexCount ? 0 : referenceIndex + 1;
-		let v2 = RefPoly.vertices[referenceIndex];
+		let v2 = RefPoly.vertices[referenceIndex].copia;
 
-		v1 = RefPoly.u.copia.mult(v1).adic(RefPoly.body.position);
-		v2 = RefPoly.u.copia.mult(v2).adic(RefPoly.body.position);
+		v1.mult(RefPoly.u);
+		v1.adic(RefPoly.corpo.posicao);
+		
+		v2.mult(RefPoly.u)
+		v2.adic(RefPoly.corpo.posicao);
 
         let sidePlaneNormal = v2.copia
-            .sub( v1 )
-		    .normalize();
+            .sub(v1)
+		    .norm();
 
 		let refFaceNormal = new Vetor2(sidePlaneNormal.y, -sidePlaneNormal.x);
 
-		let refC = Vetor2.scalar(refFaceNormal, v1);
-		let negSide = -Vetor2.scalar(sidePlaneNormal, v1);
-		let posSide = Vetor2.scalar(sidePlaneNormal, v2);
+		let refC = Vetor2.escalar(refFaceNormal, v1);
+		let negSide = -Vetor2.escalar(sidePlaneNormal, v1);
+		let posSide = Vetor2.escalar(sidePlaneNormal, v2);
 
-		if (clip(sidePlaneNormal.copia.neg(), negSide, incidentFace) < 2) {
+		if (this.clip(sidePlaneNormal.copia.neg(), negSide, incidentFace) < 2) {
 			return;
 		}
 
-		if (clip( sidePlaneNormal, posSide, incidentFace ) < 2) {
+		if (this.clip( sidePlaneNormal, posSide, incidentFace ) < 2) {
 			return;
 		}
 
@@ -409,7 +414,7 @@ class CollisionPolygonPolygon {
 		}
 
 		let cp = 0;
-		let separation = Vetor2.scalar(refFaceNormal, incidentFace[0]) - refC;
+		let separation = Vetor2.escalar(refFaceNormal, incidentFace[0]) - refC;
 		if (separation <= 0) {
 			m.contacts[cp].set(incidentFace[0]);
 			m.penetration = -separation;
@@ -418,7 +423,7 @@ class CollisionPolygonPolygon {
 			m.penetration = 0;
 		}
 
-		separation = vetor2.scalar(refFaceNormal, incidentFace[1]) - refC;
+		separation = Vetor2.escalar(refFaceNormal, incidentFace[1]) - refC;
 
 		if (separation <= 0) {
 			m.contacts[cp].set(incidentFace[1]);
@@ -431,20 +436,24 @@ class CollisionPolygonPolygon {
 	}
 
 	findAxisLeastPenetration(faceIndex, A, B) {
-		let bestDistance = -Float.MAX_VALUE;
+		let bestDistance = -Number.MAX_VALUE;
 		let bestIndex = 0;
 
 		for (let i = 0; i < A.vertexCount; ++i) {
-			let nw = A.u.copia.mult( A.normals[i] );
+			let nw = A.normals[i].copia.mult(A.u);
 
 			let buT = B.u.copia.transp();
-			let n = buT.copia.mult(nw);
+			let n = nw.copia.mult(B.u.copia.transp());
 
 			let s = B.suporte(n.copia.neg());
+			
+			let vm = A.vertices[i].copia;
+			vm.mult(A.u);
+			vm.adic(A.corpo.posicao);
+			vm.sub(B.corpo.posicao);
+			vm.mult(buT);
 
-			let v = buT.mult(A.copia.u.mul(A.vertices[i]).adic(A.corpo.position).sub(B.corpo.posicao) );
-
-			let d = Vetor2.scalar(n, s.copia.sub(v));
+			let d = Vetor2.escalar(n, s.copia.sub(vm));
 
 			if (d > bestDistance)
 			{
@@ -458,15 +467,14 @@ class CollisionPolygonPolygon {
 	}
 
 	findIncidentFace(v, RefPoly, IncPoly, referenceIndex) {
-		let referenceNormal = RefPoly.normals[referenceIndex];
-
-		referenceNormal = RefPoly.u.copia.mult( referenceNormal );
-		referenceNormal = IncPoly.u.copia.transp().mult(referenceNormal);
-																		
+		let referenceNormal = RefPoly.normals[referenceIndex].copia;
+		referenceNormal.mult(RefPoly.u);
+		referenceNormal.mult(IncPoly.u.copia.transp());
+					
 		let incidentFace = 0;
 		let minDot = Number.MAX_VALUE;
 		for (let i = 0; i < IncPoly.vertexCount; ++i) {
-			let dot = Vetor2.scalar(referenceNormal, IncPoly.normals[i]);
+			let dot = Vetor2.escalar(referenceNormal, IncPoly.normals[i]);
 
 			if (dot < minDot) {
 				minDot = dot;
@@ -474,17 +482,24 @@ class CollisionPolygonPolygon {
 			}
 		}
 
-		v[0] = IncPoly.u.copia.mult(IncPoly.vertices[incidentFace]).adic(IncPoly.corpo.posicao);
+		v[0] = IncPoly.vertices[incidentFace].copia;
+		v[0].mult(IncPoly.u);
+		v[0].adic(IncPoly.corpo.posicao);
+
+		
 		incidentFace = incidentFace + 1 >= IncPoly.vertexCount ? 0 : incidentFace + 1;
-		v[1] = IncPoly.u.copia.mult(IncPoly.vertices[incidentFace]).adic(IncPoly.corpo.posicao);
+
+		v[1] = IncPoly.vertices[incidentFace].copia;
+		v[1].mult(IncPoly.u);
+		v[1].adic(IncPoly.corpo.posicao);
 	}
 
 	clip(n, c, face) {
 		let sp = 0;
 		let out = [ new Vetor2(face[0]), new Vetor2(face[1])];
 
-		let d1 = Vetor2.scalar(n, face[0]) - c;
-		let d2 = Vetor2.scalar(n, face[1]) - c;
+		let d1 = Vetor2.escalar(n, face[0]) - c;
+		let d2 = Vetor2.escalar(n, face[1]) - c;
 
 		if (d1 <= 0) out[sp++].set(face[0]);
 		if (d2 <= 0) out[sp++].set(face[1]);
@@ -512,48 +527,48 @@ export class Mundo2 {
 
 	step() {
 		this.contacts=[];
-		// for (let i=0; i < bodies.length; ++i) {
-		// 	let A = bodies[i];
+		for (let i=0; i < this.bodies.length; ++i) {
+			let A = this.bodies[i];
 
-		// 	for (let j = i + 1; j < bodies.length; ++j) {
-		// 		let B = bodies[j];
+			for (let j = i + 1; j < this.bodies.length; ++j) {
+				let B = this.bodies[j];
 
-		// 		if (A.invMass == 0 && B.invMass == 0) {
-		// 			continue;
-		// 		}
+				if (A.massaInv == 0 && B.massaInv == 0) {
+					continue;
+				}
 
-		// 		let m = new Manifold(A, B);
-		// 		m.solve();
+				let m = new Manifold(A, B);
+				m.solve();
 
-		// 		if (m.contactCount > 0) {
-		// 			contacts.add(m);
-		// 		}
-		// 	}
-		// }
+				if (m.contactCount > 0) {
+					this.contacts.push(m);
+				}
+			}
+		}
 
 		// Integrate forces
 		for (let corpo of this.bodies) {
 			this.integrateForces(corpo, this.dt );
 		}
 
-		// for (let i = 0; i < contacts.length; ++i) {
-		// 	this.contacts[i].initialize();
-		// }
+		for (let i = 0; i < this.contacts.length; ++i) {
+			this.contacts[i].initialize();
+		}
 
-		// for (let j = 0; j < iterations; ++j) {
-		// 	for (let i = 0; i < contacts.length; ++i)
-		// 	{
-		// 		this.contacts[i].applyImpulse();
-		// 	}
-		// }
+		for (let j = 0; j < this.iterations; ++j) {
+			for (let i = 0; i < this.contacts.length; ++i)
+			{
+				this.contacts[i].applyImpulse();
+			}
+		}
 
 		for (let corpo of this.bodies) {
 			this.integrateVelocity(corpo, this.dt);
 		}
 
-		// for (let i = 0; i < this.contacts.length; ++i) {
-		// 	this.contacts[i].positionalCorrection();
-		// }
+		for (let i = 0; i < this.contacts.length; ++i) {
+			this.contacts[i].positionalCorrection();
+		}
 
 		for (let corpo of this.bodies) {
 			corpo.forca.set(0, 0);
@@ -598,6 +613,8 @@ export class Mundo2 {
 }
 
 export const Global = {
+	EPSILON: 0.0001,
     GRAVITY: new Vetor2(0, 50),
-    DT: 1/60
+	DT: 1/60
 }
+Global.RESTING = Global.GRAVITY.copia.mult(Global.DT).magQ + Global.EPSILON;
