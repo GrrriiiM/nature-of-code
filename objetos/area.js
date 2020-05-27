@@ -9,8 +9,8 @@ export class Area {
         _.w = opcoes.w !== undefined ? opcoes.w : r;
         _.h = opcoes.h !== undefined ? opcoes.h : r;
         _.posicao = _.p.createVector(
-            opcoes.x !== undefined ? opcoes.x : _.p.random(_.aW),
-            opcoes.y !== undefined ? opcoes.y : _.p.random(_.aH))
+            opcoes.x !== undefined ? opcoes.x : _.p.random(_.aW - _.w),
+            opcoes.y !== undefined ? opcoes.y : _.p.random(_.aH - _.h))
         this._ = _;
     }
 

@@ -1,5 +1,6 @@
 import { Area } from "./area.js";
 import { Forca } from "./forcas.js";
+import { Elipse } from "./formas.js";
 
 export class Mundo extends Area {
     constructor(processador, opcoes) {
@@ -22,7 +23,9 @@ export class Mundo extends Area {
         while(copia.length) {
             let forma1 = copia[0];
             for(let i=1;i<copia.length;i++) {
-                interacao.call(this, forma1, copia[i]);
+                let forma2 = copia[i];
+                if (forma1 && forma2)
+                    interacao.call(this, forma1, forma2);
             }
             copia.splice(0,1);
         }
@@ -30,11 +33,15 @@ export class Mundo extends Area {
 
     atualizar() {
         this._.formas.forEach(_ => this.aplicarColicoesParede(_));
-        this.aplicarGravidade(this._.formas[0], this._.formas[1]);
         this.formasInteracao(this.aplicarGravidade);
         this.formasInteracao(this.aplicarColisoes);
         this._.formas.forEach(_ => _.atualizar())
         this.formasInteracao(this.corrigirColisoes);
+    }
+
+    resolverColicao(forma1, forma2) {
+        let rv = forma2.v.copy().sub(forma1);
+        
     }
 
     aplicarGravidade(forma1, forma2) {
@@ -60,25 +67,24 @@ export class Mundo extends Area {
     aplicarColisao(forma1, forma2) {
 
         if (this.checarColisao(forma1, forma2)) {
-            let theta1 = forma1.v.heading();
-            let theta2 = forma2.v.heading();
-            let phi = Math.atan2(forma2.cY - forma1.cY, forma2.cX - forma1.cX);
-            let m1 = forma1.m;
-            let m2 = forma2.m;
-            let v1 = forma1.v.mag();
-            let v2 = forma2.v.mag();
-
-            let dx1F = (v1 * Math.cos(theta1 - phi) * (m1-m2) + 2*m2*v2*Math.cos(theta2 - phi)) / (m1+m2) * Math.cos(phi) + v1*Math.sin(theta1-phi) * Math.cos(phi+Math.PI/2);
-            let dy1F = (v1 * Math.cos(theta1 - phi) * (m1-m2) + 2*m2*v2*Math.cos(theta2 - phi)) / (m1+m2) * Math.sin(phi) + v1*Math.sin(theta1-phi) * Math.sin(phi+Math.PI/2);
-            let dx2F = (v2 * Math.cos(theta2 - phi) * (m2-m1) + 2*m1*v1*Math.cos(theta1 - phi)) / (m1+m2) * Math.cos(phi) + v2*Math.sin(theta2-phi) * Math.cos(phi+Math.PI/2);
-            let dy2F = (v2 * Math.cos(theta2 - phi) * (m2-m1) + 2*m1*v1*Math.cos(theta1 - phi)) / (m1+m2) * Math.sin(phi) + v2*Math.sin(theta2-phi) * Math.sin(phi+Math.PI/2);
-
-            forma1.v.x = dx1F;                
-            forma1.v.y = dy1F;                
-            forma2.v.x = dx2F; 
-            forma2.v.y = dy2F;
+            
+            let p1 = Forca.colisao(
+                forma1.m, forma2.m, 
+                forma1.cX, forma2.cX, 
+                forma1.cY, forma2.cY, 
+                forma1.v.mag(), forma2.v.mag(), 
+                forma1.v.heading(), forma2.v.heading());
         
-            //staticCollision(ob1, ob2)
+            let p2 = Forca.colisao(
+                forma2.m, forma1.m, 
+                forma2.cX, forma1.cX, 
+                forma2.cY, forma1.cY, 
+                forma2.v.mag(), forma1.v.mag(), 
+                forma2.v.heading(), forma1.v.heading());
+
+                forma1.v.set(p1.x, p1.y);
+                forma2.v.set(p2.x, p2.y);
+            
         }
     }
 
@@ -104,7 +110,7 @@ export class Mundo extends Area {
     } 
 
     checarColisao(forma1, forma2) {
-        if (!forma1.solido || !forma1.solido) return false;
+        if (!forma1.solido || !forma2.solido) return false;
         let dist = this._.p.dist(forma1.cX, forma1.cY, forma2.cX, forma2.cY);
         let espaco =  dist - (forma1.w/2 + forma2.w/2);
         return espaco <= 0;
