@@ -144,7 +144,7 @@ export class Poligono extends Forma {
 
                 let e1 = vertices[nextHullIndex].copia.sub(vertices[hull[outCount]]);
                 let e2 = vertices[i].copia.sub(vertices[hull[outCount]]);
-                let c = Vetor2.vetorial2(e1,e2 );
+                let c = Vetor2.vetorial(e1,e2);
                 if (c < 0) {
                     nextHullIndex = i;
                 }
